@@ -1,4 +1,4 @@
-namespace LeanZKCircuit
+namespace Plonky3
 
 open Lean Elab Parser Tactic in
 /--
@@ -49,4 +49,4 @@ macro_rules
                              | rewrite [BitVec.umod_def] $(l)?
               ))
 
-end LeanZKCircuit
+end Plonky3
