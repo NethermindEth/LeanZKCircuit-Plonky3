@@ -20,7 +20,7 @@ def append_subair_structure_fields (base_string: String) (circuit: SubAirDefinit
   ) base_string
 
 def define_raw_air_structure
-  (air_definition: AirDefinition) (log : Bool := false)
+  (air_definition: AirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let base_structure_string : String :=
     s!"structure Raw_{air_definition.name} (F: Type) (ExtF : Type) where\n" ++
@@ -33,15 +33,16 @@ def define_raw_air_structure
       "  last_row: ℕ"
 
   let full_structure_string := append_air_structure_fields base_structure_string air_definition
-  runAsCommand full_structure_string log
+  logInfo m!"{loc.getPos?}"
+  runAsCommand full_structure_string loc log
 
 def define_raw_subair_structure
-  (subair_definition: SubAirDefinition) (log : Bool := false)
+  (subair_definition: SubAirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let base_structure_string : String :=
     s!"structure Raw_{subair_definition.name} (F: Type) where\n" ++
       "  columns (column: ℕ) (row: ℕ) (rotation: ℕ) : F"
 
   let full_structure_string := append_subair_structure_fields base_structure_string subair_definition
-  runAsCommand full_structure_string log
+  runAsCommand full_structure_string loc log
 end Plonky3

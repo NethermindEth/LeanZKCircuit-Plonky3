@@ -5,7 +5,7 @@ open Lean
 
 namespace Plonky3
   def create_subcircuit_isValid_of_isValid_lemma
-    (circuit: String) (simp_attribute: String) (type_params: String) (proof : String) (member: String) (idx: ℕ) (log : Bool := false)
+    (circuit: String) (simp_attribute: String) (type_params: String) (proof : String) (member: String) (idx: ℕ) (loc: Syntax) (log : Bool := false)
   : Elab.Command.CommandElabM Unit := do
     let proof := s!"{proof}.1{transformIndex idx}"
     let command :=
@@ -15,10 +15,10 @@ namespace Plonky3
       s!"c.{member}.isValid := by\n" ++
       s!"  exact {proof}"
 
-    runAsCommand command log
+    runAsCommand command loc log
 
   def create_air_subair_isValid_of_isValid_lemmas
-    (defn: AirDefinition) (log : Bool := false)
+    (defn: AirDefinition) (loc: Syntax) (log : Bool := false)
   : Elab.Command.CommandElabM Unit := do
     discard ((defn.entries.filterMap (λ entry =>
       match entry with
@@ -34,11 +34,12 @@ namespace Plonky3
           "h.2"
           name
           idx
+          loc
           log
     ))
 
   def create_subair_subair_isValid_of_isValid_lemmas
-    (defn: SubAirDefinition) (log : Bool := false)
+    (defn: SubAirDefinition) (loc: Syntax) (log : Bool := false)
   : Elab.Command.CommandElabM Unit := do
     discard ((defn.entries.filterMap (λ entry =>
       match entry with
@@ -53,6 +54,7 @@ namespace Plonky3
           "h"
           name
           idx
+          loc
           log
     ))
 end Plonky3

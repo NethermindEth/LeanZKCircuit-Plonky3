@@ -66,7 +66,7 @@ def calculate_subair_column_assignments
   ) (0, [])).2
 
 def define_column_assignment
-  (circuit: String) (simp_attribute: String) (type_params: String) (idx: ℕ) (col: String) (member: String) (log : Bool := false)
+  (circuit: String) (simp_attribute: String) (type_params: String) (idx: ℕ) (col: String) (member: String) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let command :=
     s!"@[{simp_attribute}]\n" ++
@@ -75,10 +75,10 @@ def define_column_assignment
     s!": Prop :=\n" ++
     s!"  c.{col} (row := row) (rotation := rotation) =\n" ++
     s!"  c.{member} (row := row) (rotation := rotation)"
-  runAsCommand command log
+  runAsCommand command loc log
 
 def assign_raw_air_columns
-  (defn: AirDefinition) (log : Bool := false)
+  (defn: AirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let column_assignments := calculate_air_column_assignments defn
   if log then logInfo m!"Calculated air column assignments:\n{column_assignments}"
@@ -87,11 +87,11 @@ def assign_raw_air_columns
     let col := assignment.1.1
     let member := assignment.1.2
     let idx := assignment.2
-    define_column_assignment s!"Raw_{defn.name}" defn.simp_attribute "F ExtF" idx col member log
+    define_column_assignment s!"Raw_{defn.name}" defn.simp_attribute "F ExtF" idx col member loc log
   ))
 
 def assign_raw_subair_columns
-  (defn: SubAirDefinition) (log : Bool := false)
+  (defn: SubAirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let column_assignments := calculate_subair_column_assignments defn
   if log then logInfo m!"Calculated subair column assignments:\n{column_assignments}"
@@ -100,6 +100,6 @@ def assign_raw_subair_columns
     let col := assignment.1.1
     let member := assignment.1.2
     let idx := assignment.2
-    define_column_assignment s!"Raw_{defn.name}" defn.simp_attribute "F" idx col member log
+    define_column_assignment s!"Raw_{defn.name}" defn.simp_attribute "F" idx col member loc log
   ))
 end Plonky3

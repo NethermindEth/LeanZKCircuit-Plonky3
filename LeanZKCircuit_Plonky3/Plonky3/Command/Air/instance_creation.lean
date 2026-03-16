@@ -5,7 +5,7 @@ open Lean Parser
 
 namespace Plonky3
 def create_circuit_instance
-  (name: String) (log: Bool := false)
+  (name: String) (loc: Syntax) (log: Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let instance_string : String :=
     s!"instance {"{"}F ExtF{"}"} [Field F] [Field ExtF] : Circuit F ExtF {name} where\n" ++
@@ -17,15 +17,15 @@ def create_circuit_instance
     s!"  public_values := {name}.public_values\n" ++
     s!"  last_row := {name}.last_row"
 
-  runAsCommand instance_string log
+  runAsCommand instance_string loc log
 
 def create_raw_circuit_instance
-  (defn: AirDefinition) (log : Bool := false)
+  (defn: AirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit :=
-  create_circuit_instance s!"Raw_{defn.name}" log
+  create_circuit_instance s!"Raw_{defn.name}" loc log
 
 def create_valid_circuit_instance
-  (defn: AirDefinition) (log : Bool := false)
+  (defn: AirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit :=
-  create_circuit_instance s!"Valid_{defn.name}" log
+  create_circuit_instance s!"Valid_{defn.name}" loc log
 end Plonky3

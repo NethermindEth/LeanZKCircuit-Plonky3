@@ -29,7 +29,7 @@ def isValid_column_assignments_term
   (List.range num_columns).foldr (λ n acc => s!"c.col_{n} row rotation ∧ {acc}") "true"
 
 def define_air_isValid
-  (defn : AirDefinition) (log : Bool := false)
+  (defn : AirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let subair_term := isValid_air_recursion_term defn
   let num_columns := (calculate_air_column_assignments defn).length
@@ -45,10 +45,10 @@ def define_air_isValid
     s!"  ) ∧\n" ++
     s!"  ({subair_term}) ∧\n" ++
     s!"  (∀ row rotation, {columns_term})"
-  runAsCommand command log
+  runAsCommand command loc log
 
 def define_subair_isValid
-  (defn : SubAirDefinition) (log : Bool := false)
+  (defn : SubAirDefinition) (loc: Syntax) (log : Bool := false)
 : Elab.Command.CommandElabM Unit := do
   let subair_term := isValid_subair_recursion_term defn
   let num_columns := (calculate_subair_column_assignments defn).length
@@ -59,5 +59,5 @@ def define_subair_isValid
     s!": Prop :=\n" ++
     s!"  ({subair_term}) ∧\n" ++
     s!"  (∀ row rotation, {columns_term})"
-  runAsCommand command log
+  runAsCommand command loc log
 end Plonky3
