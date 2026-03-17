@@ -69,6 +69,7 @@ def define_air
   logInfo m!"{loc.getPos?}"
   check_air_member_names air_definition log
   define_raw_air_structure air_definition loc log
+
   -- create_raw_circuit_instance air_definition loc log
   -- assign_raw_air_columns air_definition loc log
   -- define_air_isValid air_definition loc log
@@ -95,20 +96,21 @@ def define_subair
   prove_valid_subair_column_assignments subair_definition loc log
   pure ()
 
-elab loc: "#define_air" defn: air_definition : command => do
+elab loc: "#define_air" defn: air_definition : command => withRef loc do
   let parsed_defn: AirDefinition := ←parse_air_definition defn
   withRef loc (define_air parsed_defn loc)
 
-elab loc: "#define_air?" defn: air_definition : command => do
+set_option hygiene false in
+elab loc: "#define_air?" defn: air_definition : command => withRef loc do
   logInfo m!"Defining Plonky3 air"
   let parsed_defn: AirDefinition := ←parse_air_definition (air_definition := defn) (log := true)
   withRef loc (define_air parsed_defn loc (log := true))
 
-elab loc: "#define_subair" defn: subair_definition : command => do
+elab loc: "#define_subair" defn: subair_definition : command => withRef loc do
   let parsed_defn: SubAirDefinition := ←parse_subair_definition defn
   withRef loc (define_subair parsed_defn loc)
 
-elab loc: "#define_subair?" defn: subair_definition : command => do
+elab loc: "#define_subair?" defn: subair_definition : command => withRef loc do
   let parsed_defn: SubAirDefinition := ←parse_subair_definition (subair_definition := defn) (log := true)
   withRef loc (define_subair parsed_defn (log := true) loc)
 

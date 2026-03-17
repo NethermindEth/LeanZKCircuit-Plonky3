@@ -5,7 +5,18 @@ open Lean Parser
 
 namespace Plonky3
 
-def runAsCommand (command_string: String) (loc: Syntax) (log: Bool := false): Elab.Command.CommandElabM Unit := do
+/--
+NB: We do not do anything smart with `info` other than propagate it down the concrete syntax tree
+as-is. This is enough for our intents and purposes.
+-/
+def _root_.Lean.Syntax.setInfoRec (stx : Syntax) (info : SourceInfo) : Syntax :=
+  match stx with
+  | .missing => .missing
+  | .node _ kind args => .node info kind (args.map (·.setInfoRec (info := info)))
+  | .atom _ val => .atom info val
+  | .ident _ rawVal val preresolved => .ident info rawVal val preresolved
+
+def runAsCommand (command_string: String) (loc: Syntax) (log: Bool := false): Elab.Command.CommandElabM Unit := withRef loc do
   if log then logInfo m!"Running command:\n{command_string}"
   let .ok command_string_stx := runParserCategory (← getEnv) `command command_string
     | throwError s!"Failed to parse command {command_string}"
@@ -35,7 +46,8 @@ def runAsCommand (command_string: String) (loc: Syntax) (log: Bool := false): El
     | .ident a b c d => logInfo m!"Ident"
 
   -- logInfo m!"Command TSyntax: {command_string_tstx.raw}"
-  withRef loc (Lean.Elab.Command.elabCommand command_string_tstx)
+  Lean.Elab.Command.elabCommand <|
+    command_string_tstx.raw.setInfoRec (mkNullNode #[loc]).getInfo?.get!
   -- let msgs := (← get).messages
   -- msgs.reported.forM (λ x => logInfo m!"Reported: {x.data}")
   -- msgs.unreported.forM (λ x => logInfo m!"Unreported: {x.data}")
